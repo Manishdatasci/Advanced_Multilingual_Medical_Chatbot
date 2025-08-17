@@ -1,16 +1,33 @@
-# 🩺 Task 3: Multilingual Medical Chatbot
+# 🧠 Advanced Multilingual Medical Chatbot
 
-This project is part of the **NullClass Internship (Task 3)** and extends a medical chatbot to support **four languages**: **English**, **Hindi**, **Marathi**, and **Bengali**. It uses **semantic understanding** with `SentenceTransformer`, **Logistic Regression** for classification, and **Google Translate API** for dynamic language translation.
+An AI-powered medical chatbot that supports **English**, **Hindi**, **Marathi**, and **Bengali**.  
+It uses **semantic search**, **automatic language detection**, and **confidence scoring** to provide accurate, language-specific medical answers.
 
----
-
-## 📌 Objective
-
-- Enable the medical chatbot to respond in four languages: English, Hindi, Marathi, Bengali.
-- Support intelligent language detection and translation.
-- Return semantically relevant answers with high accuracy and confidence scores.
-- Showcase source and raw medical data from the MedQuAD dataset.
+> _Developed by Manish Kumar Rajak_
 
 ---
 
-## 🗂️ Project Structure
+## 🚀 Features
+
+- 🌐 Supports **4 languages**: English, Hindi, Marathi, Bengali
+- 🔍 Semantic similarity using **sentence embeddings**
+- 🧠 Language detection and intelligent switching
+- ✅ Displays **confidence score (0–1)** for each response
+- 📄 Shows **source of the answer**
+- 🔁 Suggests **related questions**
+- 🖼️ Clean and user-friendly **Streamlit interface**
+
+---
+
+``` ## 📂 Project Structure
+
+Advanced_Multilingual_Medical_Chatbot/
+│
+├── main.py # Streamlit app
+├── train_model.ipynb # Jupyter Notebook for model training
+├── langchain_helper.py # Language handling utilities
+├── fixed_qa_dataset.json # Preprocessed Q&A dataset
+├── trained_classifier.pkl # Trained classification model
+├── embedded_qa_dataset.pkl # Sentence embeddings
+├── requirements.txt # Dependencies
+└── README.md # Project overview
