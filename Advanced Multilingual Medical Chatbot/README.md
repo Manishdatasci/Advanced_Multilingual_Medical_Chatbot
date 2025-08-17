@@ -3,7 +3,7 @@
 An AI-powered medical chatbot that supports **English**, **Hindi**, **Marathi**, and **Bengali**.  
 It uses **semantic search**, **automatic language detection**, **Google Translate**, and **confidence scoring** to deliver accurate medical answers.
 
-> _Developed by Manish Kumar
+> _Developed by Manish Kumar_
 
 ---
 
@@ -32,4 +32,5 @@ Advanced_Multilingual_Medical_Chatbot/
 ├── embedded_qa_dataset.pkl # Embedded Q&A dataset using SentenceTransformer
 ├── requirements.txt # Required Python packages
 └── README.md # Project documentation
+
 
