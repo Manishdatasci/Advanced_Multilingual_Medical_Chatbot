@@ -9,7 +9,7 @@ from sklearn.linear_model import LogisticRegression
 
 DetectorFactory.seed = 0
 
-# Load model and data
+# --- Load Model and Data ---
 with open("trained_classifier.pkl", "rb") as f:
     clf = pickle.load(f)
 
@@ -19,11 +19,15 @@ with open("embedded_qa_dataset.pkl", "rb") as f:
 qa_data = dataset["data"]
 embeddings = np.array(dataset["embeddings"])
 
-# Load embedding model
-embedder = SentenceTransformer("all-MiniLM-L6-v2")
+# --- Load Embedder with Caching ---
+@st.cache_resource
+def load_embedder():
+    return SentenceTransformer("all-MiniLM-L6-v2")
+
+embedder = load_embedder()
 translator = Translator()
 
-# Supported languages
+# --- Supported Languages ---
 supported_langs = {
     "en": "English",
     "hi": "Hindi",
@@ -31,10 +35,10 @@ supported_langs = {
     "bn": "Bengali"
 }
 
+# --- Language Detection ---
 def detect_language(text):
     try:
         if len(text.strip().split()) <= 2:
-            # Fallback to asking user or default if too short
             return fallback_detect(text)
         lang = detect(text)
         return lang if lang in supported_langs else fallback_detect(text)
@@ -42,23 +46,22 @@ def detect_language(text):
         return fallback_detect(text)
 
 def fallback_detect(text):
-    # Heuristic-based Bengali detection (basic example)
-    bengali_chars = set("অআইঈউঊঋএঐওঔকখগঘঙচছজঝঞটঠডঢণতথদধনপফবভমযরলশষসহ")
-    if any(char in bengali_chars for char in text):
+    # Bengali script Unicode range
+    if any('\u0980' <= ch <= '\u09FF' for ch in text):
         return "bn"
-    # Could be Hindi/Marathi if Devnagari
-    devanagari_range = ('\u0900', '\u097F')
-    if any(devanagari_range[0] <= ch <= devanagari_range[1] for ch in text):
-        return "hi"  # defaulting to Hindi
+    # Devanagari script Unicode range – Hindi/Marathi fallback
+    if any('\u0900' <= ch <= '\u097F' for ch in text):
+        return "hi"
     return "en"
 
+# --- Translation Helpers ---
 def translate_to_english(text, lang_code):
     if lang_code == "en":
         return text
     try:
         return translator.translate(text, src=lang_code, dest="en").text
     except:
-        return text  # fallback
+        return text
 
 def translate_to_user_language(text, lang_code):
     if lang_code == "en":
@@ -68,6 +71,7 @@ def translate_to_user_language(text, lang_code):
     except:
         return text
 
+# --- Core Answer Retrieval ---
 def get_top_answer(user_question):
     question_embedding = embedder.encode([user_question])[0]
     similarities = np.dot(embeddings, question_embedding) / (
@@ -94,6 +98,7 @@ st.set_page_config(page_title="Multilingual Medical Chatbot", layout="wide")
 st.title("🩺 Multilingual Medical Chatbot")
 st.markdown("Ask your medical question in **English, Hindi, Marathi, or Bengali.**")
 
+# --- Sidebar ---
 with st.sidebar:
     st.header("💡 Chatbot Info")
     st.markdown("""
@@ -105,23 +110,16 @@ with st.sidebar:
     show_raw = st.checkbox("🔍 Show raw data info")
     st.markdown("📁 **Dataset:** MedQuAD (by U.S. National Library of Medicine)")
 
+# --- User Input ---
 user_input = st.text_input("Type your medical question here 👇")
 
 if user_input:
-    # For Detecting language
     user_lang = detect_language(user_input)
     lang_name = supported_langs.get(user_lang, "Unknown")
-
-    # For Translating question to English
     translated_question = translate_to_english(user_input, user_lang)
-
-    # For Getting answer
     result = get_top_answer(translated_question)
-
-    # For Translating answer back
     final_answer = translate_to_user_language(result["answer"], user_lang)
 
-    # For Displaying result
     st.success(f"🎯 **Answer:** {final_answer}")
     st.info(f"📊 **Confidence:** {result['confidence']} | 🌐 Language: {lang_name}")
     st.caption(f"🔗 Source: {result['source']}")
@@ -129,3 +127,7 @@ if user_input:
     if show_raw:
         st.subheader("🧬 Raw Result")
         st.json(result["raw"])
+
+# --- Footer ---
+st.markdown("---")
+st.markdown("✅ Developed with ❤️ by **Manish Kumar Rajak** | © 2025")
